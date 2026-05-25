@@ -1,0 +1,55 @@
+What is Medallion Architecture?
+Based on your project documentation, Medallion Architecture is a data design 
+pattern used to logically organize data in a lakehouse (like S3 or Databricks). 
+It organizes data into three distinct layers to ensure quality, reliability, 
+and scalability.
+
+Here is a breakdown of the three layers:
+
+1. Bronze Layer (Raw Data)
+
+The Bronze layer is the landing zone where data is 
+stored in its original, raw format directly from the source.
+Purpose: To provide a "Source of Truth" for auditing and data recovery.
+
+Key Action: No transformations or cleaning are performed here.
+
+Analogy: The raw ingredients in your pantry.
+
+2. Silver Layer (Cleaned & Standardized)
+
+The Silver layer represents data that has been cleaned, filtered, and standardized.
+Purpose: To provide a reliable source for ad-hoc analysis and data science.
+
+Key Actions: * Removing duplicates and null values.
+
+Standardizing date/time formats and column names.
+Joining different data sources together.
+
+Analogy: The ingredients are washed, chopped, and prepared for cooking.
+
+3. Gold Layer (Business-Ready/Analytics)
+
+The Gold layer contains highly refined and aggregated data formatted for 
+specific business use cases.
+Purpose: To power BI dashboards, executive reporting, and production-level analytics.
+
+Key Actions: * Creating "Star Schema" models (Fact and Dimension tables).
+
+Calculating KPIs (e.g., total revenue, monthly active users).
+Optimizing for fast query performance.
+
+Analogy: A plated, finished meal ready to be served.
+
+Why is this important for your Data Engineering project?
+Using this architecture allows you to:
+
+Reprocess Data: If your cleaning logic changes, you can simply re-run the 
+pipeline from the Bronze layer.
+
+Debug Easily: If a report in the Gold layer looks wrong, you can trace the 
+data back through Silver to see where the error occurred.
+
+Improve Reliability: It ensures that stakeholders only see the highest 
+quality data (Gold), while the messy work happens behind the scenes.
+
