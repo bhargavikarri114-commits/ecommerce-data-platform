@@ -1,57 +1,52 @@
 import pandas as pd
-import logging
-from sqlalchemy import create_engine
-from urllib.parse import quote_plus
+# import logging
+# from sqlalchemy import create_engine
+# from urllib.parse import quote_plus
+from config.db_config import engine
+from utils.logger import logger
+from utils.transformations import clean_dataframe
 
-# Logging configuration
+# Tables to Process
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-# Database Connection
-username = "postgres"
-password = quote_plus("Pmnbvcxz@1")
-host = "localhost"
-port = "5432"
-database = "ecommerce_db"
-
-engine = create_engine(
-    f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{database}"
-)
-
-# read bronze data
-
-query = "select * from bronze.customers"
-
-customers_df = pd.read_sql(query, engine)
-
-logging.info(f"Read {len(customers_df)} records from bronze.customers")
-
-# Data Cleaning
-
-# Remove duplicates
-customers_df = customers_df.drop_duplicates()
-logging.info(f"Removed duplicates, {len(customers_df)} records remaining")
-
-# Handle null values
-customers_df = customers_df.fillna("unknown")
-
-# Standardize column names
-customers_df.columns = [
-    col.lower().strip()
-    for col in customers_df.columns
+tables = [
+    "customers",
+    "orders",
+    "order_items",
+    "products",
+    "sellers",
+    "order_payments",
+    "order_reviews",
+    "geolocation",
+    "product_category"
 ]
 
-# Load to silver layer
+for table in tables:
+    try:
 
-customers_df.to_sql(
-    name="customers",
-    con=engine,
-    schema="silver",
-    if_exists="replace",
-    index=False
-)
+        logger.info(f"Processing table: {table}")
+        # Read Bronze data
+        query = f"SELECT * FROM bronze.{table}"
+        df = pd.read_sql(query, engine)
+        logger.info(f"Loaded {len(df)} records from bronze.{table}")
 
-logging.info(f"Successfully loaded {len(customers_df)} records into silver.customers")
+        # Cleaning
+        # Remove duplicates
+        df = clean_dataframe(df)
+
+        logger.info(f"Rows after cleaning: {len(df)}")
+
+        # Load into Silver
+        df.to_sql(
+            name=table,
+            con=engine,
+            schema="silver",
+            if_exists="replace",
+            index=False
+        )
+
+        logger.info(f"Loaded silver.{table}")
+    
+    except Exception as e:
+
+        logger.error(f"Error processing table {table}: {e}")
+        logger.error(str(e))
