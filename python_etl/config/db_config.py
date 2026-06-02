@@ -6,7 +6,7 @@ from urllib.parse import quote_plus
 username = "postgres"
 password = quote_plus("Pmnbvcxz@1")
 
-host = "localhost"
+host = "host.docker.internal"
 port = "5432"
 database = "ecommerce_db"
 
