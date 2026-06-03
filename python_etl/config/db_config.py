@@ -1,17 +1,20 @@
+import os
 from sqlalchemy import create_engine
+from dotenv import load_dotenv
 from urllib.parse import quote_plus
 
-# Database credentials
+# Load env variables
 
-username = "postgres"
-password = quote_plus("Pmnbvcxz@1")
+load_dotenv()
 
-host = "host.docker.internal"
-port = "5432"
-database = "ecommerce_db"
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = quote_plus (os.getenv("DB_PASSWORD"))
 
-# Create engine
-
-engine = create_engine(
-    f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{database}"
+DATABASE_URL = (
+    f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 )
+
+engine = create_engine(DATABASE_URL)

@@ -56,7 +56,5 @@ quality data (Gold), while the messy work happens behind the scenes.
 
 docker compose down -v
 docker compose run airflow-webserver airflow db migrate
-docker compose run airflow-webserver airflow users create --username admin 
---firstname admin --lastname user --role Admin --email admin@example.com 
---password admin
+docker compose run airflow-webserver airflow users create --username admin --firstname admin --lastname user --role Admin --email admin@example.com --password admin
 docker compose up
