@@ -126,7 +126,7 @@ def run_gold_layer():
     # Fact__orders
 
     fact_query = f"""
-    Select
+    Select distinct
         oi.order_id,
         o.customer_id,
         oi.product_id,
@@ -134,7 +134,8 @@ def run_gold_layer():
         oi.price,
         oi.freight_value,
         op.payment_type,
-        o.order_purchase_timestamp
+        o.order_purchase_timestamp,
+        date(o.order_purchase_timestamp) as order_date
     from silver.order_items oi
     join silver.orders o
         on oi.order_id = o.order_id
