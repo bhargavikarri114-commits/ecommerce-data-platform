@@ -6,6 +6,12 @@ from sqlalchemy import text
 from python_etl.config.db_config import engine
 from python_etl.utils.logger import logger
 from python_etl.utils.transformations import clean_dataframe
+from python_etl.utils.data_quality import (
+    check_nulls, 
+    check_duplicates, 
+    check_row_count, 
+    check_referential_integrity
+)
 
 def run_silver_transformation():
     # Tables to Process
@@ -58,6 +64,30 @@ def run_silver_transformation():
 
                 logger.info(f"Rows after cleaning: {len(orders_df)}")
 
+                if orders_df.empty:
+                    logger.info("No records remaining after cleaning.")
+                    continue
+            
+                check_row_count(orders_df)
+                check_nulls(orders_df, "order_id")
+                check_duplicates(orders_df, "order_id")
+                customers_df = pd.read_sql(
+                    """
+                    select customer_id
+                    from bronze.customers
+                    """,
+                    engine
+                )
+
+                logger.info(f"Rows after cleaning: {len(orders_df)}")
+
+                check_referential_integrity(
+                    child_df=orders_df,
+                    parent_df=customers_df,
+                    child_key="customer_id",
+                    parent_key="customer_id"
+                )
+
                 orders_df.to_sql(
                     name="orders",
                     con=engine,
@@ -68,10 +98,6 @@ def run_silver_transformation():
 
                 logger.info("Loaded silver.orders")
 
-                if orders_df.empty:
-                    logger.info("No new records found for silver layer.")
-                    continue
-                
                 new_watermark = orders_df["order_purchase_timestamp"].max()
 
                 update_query = text("""
@@ -95,7 +121,6 @@ def run_silver_transformation():
                 # Cleaning
                 # Remove duplicates
                 df = clean_dataframe(df)
-
                 logger.info(f"Rows after cleaning: {len(df)}")
 
                 # Load into Silver
