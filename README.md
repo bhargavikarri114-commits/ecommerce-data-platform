@@ -1,5 +1,17 @@
 # E-Commerce Data Engineering Platform
 
+## Architecture
+
+![Architecture](project_assets/architecture_diagram.png)
+
+## Executive Dashboard
+
+![Executive Dashboard](project_assets/executive_dashboard.png)
+
+## Geographical Analysis
+
+![Geographical Analysis](project_assets/geographical_analysis.png)
+
 ## Project Overview
 
 This project is an end-to-end ELT Data Engineering pipeline built using Python, PostgreSQL, Apache Airflow, Docker, and Power BI.
